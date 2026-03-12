@@ -676,7 +676,10 @@ function confirmarAsistencia() {
     }
     window.open("https://api.whatsapp.com/send?phone=+5215656855722&text=Hola,%20confirmo%20mi%20asistencia%20a%20tu%20evento", '_blank');
 }
-
+function descargarExcel(){
+    var url = `${API}confirm_excel?cliente_id=${CLIENTE_ID}&r=${Math.random()}`;
+    window.location.href = url;
+}
 
 </script>
 </body>
