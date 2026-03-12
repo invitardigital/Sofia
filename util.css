@@ -437,6 +437,9 @@
     color: #00126f;
 }
 
+.d_none{
+    display: none;
+}
 
 .d_block{
     display: block;
