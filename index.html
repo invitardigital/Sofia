@@ -116,9 +116,8 @@
             </div>
   
 
-            <div class="pst_absolute w_100" style="bottom: 5%; " id="acces">
-                <a href="https://api.whatsapp.com/send?phone=+5215656855722&text=Hola,%20confirmo%20mi%20asistencia%20a%20tu%20evento"  
-                target="_blank" style=" display: block; background:rgba(255, 0, 0, 0); width: 100%; height: 150px; "></a>
+            <div class="pst_absolute w_100 " 
+            style="bottom: 5%; background:rgba(255, 0, 0, 0); width: 100%; height: 150px;" id="acces" onclick="confirmarAsistencia()">
             </div>
   
 
@@ -442,8 +441,10 @@ $(window).scrollTop(0);
 class UrlParams {  constructor() { this.params = new URLSearchParams(window.location.search); }  get(key) { return this.params.get(key); } }
 const url = new UrlParams();
 var invitado = url.get('invitado');
+var invitadoId = null;
+
 if(invitado!=null){
-    var link = `${API}pase_show?cliente_id=${CLIENTE_ID}&familia=${invitado}&r=${Math.random()}`;
+    var link = `${API}confirm_show?cliente_id=${CLIENTE_ID}&familia=${invitado}&r=${Math.random()}`;
     function procesarRespuesta(data) {
         var data = JSON.parse(data);
         if (data.message == false) {
@@ -458,6 +459,7 @@ if(invitado!=null){
                 str = str + n + " persona";
             }
             $("*#txt_personas").html(str);
+            invitadoId = data.message.id;
             console.log(data.message);
         }
     }
@@ -482,7 +484,7 @@ async function Login(){
     var formData = $('#exampleModal form');
     var serialize = formData.serialize();
     var dataObj = formData.serializeArray();
-    var url = `${API}pase_login?cliente_id=${CLIENTE_ID}&clave=${dataObj[0].value}`;
+    var url = `${API}confirm_login?cliente_id=${CLIENTE_ID}&clave=${dataObj[0].value}`;
     
     function procesarRespuesta(data) {
         if (data == 'error') {
@@ -494,7 +496,7 @@ async function Login(){
         }
         
         if (data == 'exito') {
-            var all = `${API}/pase_all?cliente_id=${CLIENTE_ID}&r=${Math.random()}`;
+            var all = `${API}/confirm_all?cliente_id=${CLIENTE_ID}&r=${Math.random()}`;
             
             function procesarRespuestaAll(data) {
                 $("#exampleModal").html(data);
@@ -575,6 +577,7 @@ function addinvitado(){
         <tr data-familia="${familia}">
             <td>${familia}</td>
             <td>${personas}</td>
+            <td>❌ No</td>
             <td class="text_center">
                 <button type="button" class="btn btn-primary p_5" onclick="compartirWat('${familia}')"><span class="material-icons">reply</span></button>
                 <button type="button" class="btn btn-danger p_5" onclick="deleteFam('${familia}')"><span class="material-icons">delete</span></button>
@@ -588,7 +591,7 @@ function addinvitado(){
     }).showToast();
     document.getElementById('familia').value = '';
     document.getElementById('personas').value = '';
-    var url = `${API}pase_update?cliente_id=${CLIENTE_ID}&tipo=1&familia=${familia}&personas=${personas}&r=${Math.random()}`;
+    var url = `${API}confirm_update?cliente_id=${CLIENTE_ID}&tipo=1&familia=${familia}&personas=${personas}&r=${Math.random()}`;
     function procesarRespuesta(data) {
         console.log('Invitado agregado exitosamente');
     }
@@ -612,7 +615,7 @@ function deleteFam(familia){
     if(totalTr < 1){
         tbody.innerHTML += `
             <tr>
-                <td class="text_center" colspan="3">Agrega invitados en la parte de abajo</td>
+                <td class="text_center" colspan="4">Agrega invitados en la parte de abajo</td>
             </tr>
         `;
     }
@@ -622,7 +625,7 @@ function deleteFam(familia){
         backgroundColor: "#4CAF50"
     }).showToast();
 
-    var url = `${API}pase_update?cliente_id=${CLIENTE_ID}&tipo=0&familia=${familia}&r=${Math.random()}`;
+    var url = `${API}confirm_update?cliente_id=${CLIENTE_ID}&tipo=0&familia=${familia}&r=${Math.random()}`;
     
     function procesarRespuesta(data) {
         console.log('Invitado borrado exitosamente');
@@ -664,8 +667,15 @@ function toTitleCase(str) {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
         .join(' ');
 }
-
-
+function confirmarAsistencia() {
+    if (invitadoId !== null) {
+        fetch(`${API}confirm_confirm?id=${invitadoId}&r=${Math.random()}`)
+            .then(response => response.text())
+            .then(res => console.log('Confirmado:', res))
+            .catch(error => console.error('Error al confirmar:', error));
+    }
+    window.open("https://api.whatsapp.com/send?phone=+5215656855722&text=Hola,%20confirmo%20mi%20asistencia%20a%20tu%20evento", '_blank');
+}
 
 
 </script>
